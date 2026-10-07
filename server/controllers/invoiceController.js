@@ -144,6 +144,54 @@ const getInvoiceById = async (req, res, next) => {
   }
 };
 
+const updateInvoiceStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const allowedStatuses = ["draft", "sent", "paid", "cancelled"];
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid invoice ID",
+      });
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid invoice status",
+      });
+    }
+
+    const invoice = await Invoice.findOneAndUpdate(
+      {
+        _id: id,
+        userId: req.user.id,
+      },
+      {
+        status,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!invoice) {
+      return res.status(404).json({
+        message: "Invoice not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Invoice status updated successfully",
+      invoice,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateInvoice = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -296,4 +344,5 @@ module.exports = {
   getInvoiceById,
   updateInvoice,
   deleteInvoice,
+  updateInvoiceStatus,
 };

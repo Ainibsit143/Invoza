@@ -5,6 +5,7 @@ const {
   getInvoices,
   getInvoiceById,
   updateInvoice,
+  updateInvoiceStatus,
   deleteInvoice,
 } = require("../controllers/invoiceController");
 
@@ -16,6 +17,7 @@ router.post("/", authMiddleware, createInvoice);
 router.get("/", authMiddleware, getInvoices);
 router.get("/:id", authMiddleware, getInvoiceById);
 router.put("/:id", authMiddleware, updateInvoice);
+router.patch("/:id/status", authMiddleware, updateInvoiceStatus);
 router.delete("/:id", authMiddleware, deleteInvoice);
 
 module.exports = router;
