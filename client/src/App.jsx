@@ -1,31 +1,29 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-function Home() {
-  return (
-    <div>
-      <h1>Invoza</h1>
-      <p>Simple invoicing for freelancers & small businesses.</p>
-      <Link to="/login">Login</Link>
-    </div>
-  );
-}
-
-function Login() {
-  return (
-    <div>
-      <h1>Login</h1>
-      <Link to="/">Back to Home</Link>
-    </div>
-  );
-}
+import { AuthProvider } from "./context/AuthContext";
+import { GuestRoute, ProtectedRoute } from "./components/auth/RouteGuards";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
