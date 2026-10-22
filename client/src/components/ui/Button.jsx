@@ -15,6 +15,8 @@ function Button({
       "bg-[#12B8A6] text-[#0B1730] hover:bg-[#0FA697] focus-visible:outline-[#0B1730]",
     secondary:
       "border border-slate-200 bg-white text-[#0B1730] hover:bg-slate-50 focus-visible:outline-[#12B8A6]",
+    danger:
+        "bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600",
   };
 
   return (
