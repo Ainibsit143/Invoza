@@ -1,34 +1,12 @@
+import RowActions from "../ui/RowActions";
 
 const COLUMNS =
   "md:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1.2fr)_auto]";
 
-function RowActions({ customer, onEdit, onDelete }) {
-  return (
-    <div className="-mb-1 -ml-3 mt-3 flex items-center gap-1 md:m-0 md:justify-end">
-      <button
-        type="button"
-        onClick={() => onEdit(customer)}
-        aria-label={`Edit ${customer.name}`}
-        className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#0F766E] hover:bg-[#12B8A6]/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#12B8A6]"
-      >
-        Edit
-      </button>
-      <button
-        type="button"
-        onClick={() => onDelete(customer)}
-        aria-label={`Delete ${customer.name}`}
-        className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-      >
-        Delete
-      </button>
-    </div>
-  );
-}
-
 function CustomerTable({ customers, onEdit, onDelete }) {
   return (
     <div className="md:overflow-hidden md:rounded-2xl md:border md:border-slate-200 md:bg-white md:shadow-sm">
-
+      {/* Column titles: only on tablet and desktop */}
       <div
         aria-hidden="true"
         className={`hidden gap-4 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 md:grid ${COLUMNS}`}
@@ -69,9 +47,10 @@ function CustomerTable({ customers, onEdit, onDelete }) {
             </p>
 
             <RowActions
-              customer={customer}
-              onEdit={onEdit}
-              onDelete={onDelete}
+              label={customer.name}
+              onEdit={() => onEdit(customer)}
+              onDelete={() => onDelete(customer)}
+              className="-mb-1 -ml-3 mt-3 md:m-0 md:justify-end"
             />
           </li>
         ))}
