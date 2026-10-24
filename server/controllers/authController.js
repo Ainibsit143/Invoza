@@ -3,6 +3,14 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 
+// The only user fields the frontend is allowed to see
+const toPublicUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  currency: user.currency,
+});
+
 const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -70,11 +78,7 @@ const registerUser = async (req, res, next) => {
     res.status(201).json({
       message: "User registered successfully",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      user: toPublicUser(user),
     });
   } catch (error) {
     next(error);
@@ -145,11 +149,7 @@ const loginUser = async (req, res, next) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      user: toPublicUser(user),
     });
   } catch (error) {
     next(error);
@@ -167,11 +167,48 @@ const getCurrentUser = async (req, res, next) => {
     }
 
     res.status(200).json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      user: toPublicUser(user),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Real ISO 4217 codes known to Node (a few special codes are not real money)
+const SUPPORTED_CURRENCIES = new Set(
+  Intl.supportedValuesOf("currency").filter(
+    (code) => code !== "XXX" && code !== "XTS"
+  )
+);
+
+const updateCurrentUser = async (req, res, next) => {
+  try {
+    const { currency } = req.body;
+
+    const normalizedCurrency =
+      typeof currency === "string" ? currency.trim().toUpperCase() : "";
+
+    if (!SUPPORTED_CURRENCIES.has(normalizedCurrency)) {
+      return res.status(400).json({
+        message: "Please choose a valid currency",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { currency: normalizedCurrency },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Currency updated successfully",
+      user: toPublicUser(user),
     });
   } catch (error) {
     next(error);
@@ -182,4 +219,5 @@ module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
+  updateCurrentUser,
 };

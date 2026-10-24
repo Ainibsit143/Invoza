@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
+     currency: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      match: /^[A-Z]{3}$/,
+      default: "USD",
+    },
   },
   {
     timestamps: true,
