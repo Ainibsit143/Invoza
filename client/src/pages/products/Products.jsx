@@ -2,17 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 
 import ProductForm from "../../components/products/ProductForm";
 import ProductTable from "../../components/products/ProductTable";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import Pagination from "../../components/ui/Pagination";
 import { productService } from "../../services/products";
 
-const PAGE_SIZE = 2;
-
-const CURRENCY = "USD";
+const PAGE_SIZE = 10;
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const { user } = useAuth();
+  const currency = user?.currency ?? "USD";
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
@@ -250,7 +251,7 @@ function Products() {
               <>
                 <ProductTable
                   products={visible}
-                  currency={CURRENCY}
+                  currency={currency}
                   onEdit={openEdit}
                   onDelete={openDelete}
                 />
@@ -273,7 +274,7 @@ function Products() {
       >
         <ProductForm
           product={editing}
-          currency={CURRENCY}
+          currency={currency}
           onSubmit={handleSave}
           onCancel={closeForm}
         />

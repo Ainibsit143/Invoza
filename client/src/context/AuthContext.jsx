@@ -70,6 +70,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+    const updateCurrency = async (currency) => {
+    const data = await api.patch("/auth/me", { currency });
+
+    setUser(data.user);
+
+    return data.user;
+  };
+
   const value = {
     user,
     loading,
@@ -77,6 +85,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateCurrency,
   };
 
   return (

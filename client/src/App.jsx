@@ -5,9 +5,10 @@ import { GuestRoute, ProtectedRoute } from "./components/auth/RouteGuards";
 import AppLayout from "./components/layout/AppLayout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Dashboard from "./pages/dashboard/Dashboard";
 import Customers from "./pages/customers/Customers";
+import Dashboard from "./pages/dashboard/Dashboard";
 import Products from "./pages/products/Products";
+import Settings from "./pages/settings/Settings";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
 
