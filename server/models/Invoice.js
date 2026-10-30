@@ -52,6 +52,18 @@ const customerSnapshotSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const businessSnapshotSchema = new mongoose.Schema(
+  {
+    name: { type: String, trim: true },
+    email: { type: String, trim: true, lowercase: true },
+    phone: { type: String, trim: true },
+    address: { type: String, trim: true },
+    taxId: { type: String, trim: true },
+    paymentDetails: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
 const invoiceSchema = new mongoose.Schema(
   {
     invoiceNumber: {
@@ -70,6 +82,11 @@ const invoiceSchema = new mongoose.Schema(
     customer: {
       type: customerSnapshotSchema,
       required: true,
+    },
+
+    // Copy of the sender's business details, taken when the invoice is saved
+    business: {
+      type: businessSnapshotSchema,
     },
 
     items: {

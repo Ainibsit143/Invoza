@@ -249,6 +249,100 @@ const main = async () => {
       !res.data?.invoices?.some((i) => i._id === second._id)
   );
 
+    // ---------- Business profile ----------
+  console.log("\nBusiness profile");
+
+  res = await call("GET", "/profile/business", null);
+  expectStatus("no token -> 401", res, 401);
+
+  res = await call("PUT", "/profile/business", token, {
+    name: "Test Studio",
+    email: "Billing@Test-Studio.com",
+    phone: "+92 300 0000000",
+    address: "1 Test Road\nLahore",
+    taxId: "NTN-1234567",
+    paymentDetails: "Bank: HBL\nIBAN: PK00 HABB 0000 0000 0000 0000",
+  });
+  expectStatus("save business details -> 200", res, 200);
+  check(
+    "email is lowercased",
+    res.data?.business?.email === "billing@test-studio.com"
+  );
+  check(
+    "multi-line payment details are kept",
+    res.data?.business?.paymentDetails?.includes("\n") === true
+  );
+
+  res = await call("GET", "/profile/business", token);
+  check("saved details can be read back", res.data?.business?.name === "Test Studio");
+
+  const badBusiness = [
+    ["invalid email", { email: "not-an-email" }],
+    ["name over 100 characters", { name: "x".repeat(101) }],
+    ["payment details over 500 characters", { paymentDetails: "x".repeat(501) }],
+    ["phone is a number, not text", { phone: 12345 }],
+    ["object instead of text", { name: { $gt: "" } }],
+  ];
+
+  for (const [name, body] of badBusiness) {
+    res = await call("PUT", "/profile/business", token, body);
+    expectStatus(`${name} -> 400`, res, 400);
+  }
+
+  // The failed saves must not have changed anything
+  res = await call("GET", "/profile/business", token);
+  check("bad requests changed nothing", res.data?.business?.name === "Test Studio");
+
+
+  // ---------- Business details on invoices ----------
+  console.log("\nBusiness details on invoices");
+
+  res = await call("POST", "/invoices", token, valid);
+  expectStatus("create invoice after saving the profile -> 201", res, 201);
+  const withBusiness = res.data?.invoice;
+
+  check(
+    "invoice carries the business details",
+    withBusiness?.business?.name === "Test Studio" &&
+      withBusiness?.business?.taxId === "NTN-1234567" &&
+      withBusiness?.business?.paymentDetails?.includes("IBAN") === true
+  );
+
+  await call("PUT", "/profile/business", token, { name: "Renamed Studio" });
+
+  res = await call("GET", `/invoices/${withBusiness._id}`, token);
+  check(
+    "changing the profile does not touch an existing draft until it is edited",
+    res.data?.invoice?.business?.name === "Test Studio"
+  );
+
+  res = await call("PUT", `/invoices/${withBusiness._id}`, token, valid);
+  check(
+    "editing a draft refreshes the business details",
+    res.data?.invoice?.business?.name === "Renamed Studio"
+  );
+
+  await call("PATCH", `/invoices/${withBusiness._id}/status`, token, {
+    status: "sent",
+  });
+  await call("PUT", "/profile/business", token, { name: "Third Name" });
+
+  res = await call("GET", `/invoices/${withBusiness._id}`, token);
+  check(
+    "a sent invoice keeps its business details",
+    res.data?.invoice?.business?.name === "Renamed Studio"
+  );
+
+  // Leave a complete profile behind so the Settings page has something to show
+  await call("PUT", "/profile/business", token, {
+    name: "Test Studio",
+    email: "billing@test-studio.com",
+    phone: "+92 300 0000000",
+    address: "1 Test Road\nLahore",
+    taxId: "NTN-1234567",
+    paymentDetails: "Bank: HBL\nIBAN: PK00 HABB 0000 0000 0000 0000",
+  });
+
   // ---------- Auth and ownership ----------
   console.log("\nAuth and ownership");
 
@@ -263,6 +357,13 @@ const main = async () => {
 
     res = await call("GET", `/invoices/${id}`, token2);
     expectStatus("other user cannot read it -> 404", res, 404);
+
+
+    res = await call("GET", "/profile/business", token2);
+    check(
+      "other user does not see my business details",
+      res.data?.business?.name !== "Test Studio"
+    );
 
     res = await call("PUT", `/invoices/${id}`, token2, valid);
     expectStatus("other user cannot edit it -> 404", res, 404);

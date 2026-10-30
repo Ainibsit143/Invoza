@@ -33,6 +33,21 @@ const formatInvoiceNumber = (number) =>
 
 const fail = (status, message) => ({ error: { status, message } });
 
+const BUSINESS_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "address",
+  "taxId",
+  "paymentDetails",
+];
+
+// Copy of the user's current business details, stored on the invoice
+const toBusinessSnapshot = (user) =>
+  Object.fromEntries(
+    BUSINESS_FIELDS.map((key) => [key, user.business?.[key] ?? ""])
+  );
+
 // Validates the request body and builds the invoice fields.
 // Returns { error: { status, message } } or { data }.
 // Used by both create and update so the rules live in one place.
@@ -194,6 +209,7 @@ const createInvoice = async (req, res, next) => {
       ...data,
       invoiceNumber: formatInvoiceNumber(user.invoiceCounter),
       currency: data.currency ?? user.currency,
+      business: toBusinessSnapshot(user),
       userId: req.user.id,
     });
 
@@ -343,6 +359,13 @@ const updateInvoice = async (req, res, next) => {
       return res.status(error.status).json({ message: error.message });
     }
 
+        // A draft always carries the owner's latest business details
+    const owner = await User.findById(req.user.id).select("business");
+
+    if (!owner) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
     // Invoice number, status and owner are never changed by an edit
     const { notes, ...fields } = data;
 
@@ -350,9 +373,10 @@ const updateInvoice = async (req, res, next) => {
       $set: {
         ...fields,
         currency: data.currency ?? invoice.currency,
+        business: toBusinessSnapshot(owner),
       },
     };
-
+    
     if (notes === undefined) {
       update.$unset = { notes: "" };
     } else {

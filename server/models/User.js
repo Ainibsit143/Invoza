@@ -35,6 +35,15 @@ const userSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+
+        business: {
+            name: { type: String, trim: true, maxlength: 100 },
+            email: { type: String, trim: true, lowercase:true, maxlength: 100 },
+            phone: { type: String, trim: true, maxlength: 30 },
+            address: { type: String, trim: true, maxlength: 300 },
+            taxId: { type: String, trim: true, maxlength: 50 },   
+            paymentDetails: { type: String, trim: true, maxlength: 500 },
+        },
   },
   {
     timestamps: true,

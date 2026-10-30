@@ -4,6 +4,7 @@ const authRoutes = require("./routes/authRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const productRoutes = require("./routes/productRoutes");
 const invoiceRoutes = require("./routes/invoiceRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 
 const express = require("express");
 const helmet = require("helmet");
@@ -30,6 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/invoices", invoiceRoutes);
+app.use("/api/profile", profileRoutes);
 
 const PORT = process.env.PORT || 5000;
 
