@@ -7,6 +7,8 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Customers from "./pages/customers/Customers";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Invoices from "./pages/invoices/Invoices";
+import InvoiceEditor from "./pages/invoices/InvoiceEditor";
 import Products from "./pages/products/Products";
 import Settings from "./pages/settings/Settings";
 
@@ -25,6 +27,9 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/invoices/new" element={<InvoiceEditor key="new" />} />
+              <Route path="/invoices/:id/edit" element={<InvoiceEditor key="edit" />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
