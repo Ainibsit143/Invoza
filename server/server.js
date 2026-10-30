@@ -51,6 +51,29 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Server error:", err.message);
 
+  // Mongoose validation failed (bad input, not a server fault)
+  if (err.name === "ValidationError") {
+    const firstError = Object.values(err.errors)[0];
+
+    return res.status(400).json({
+      message: firstError?.message || "Invalid data",
+    });
+  }
+
+  if (err.name === "CastError") {
+    return res.status(400).json({ message: "Invalid data" });
+  }
+
+  // Unique index violated
+  if (err.code === 11000) {
+    return res.status(409).json({ message: "This record already exists" });
+  }
+
+  // Broken JSON in the request body
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ message: "Invalid JSON in request body" });
+  }
+
   res.status(err.status || 500).json({
     message: "Something went wrong",
   });

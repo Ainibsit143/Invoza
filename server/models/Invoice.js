@@ -8,13 +8,32 @@ const invoiceItemSchema = new mongoose.Schema(
       required: true,
     },
 
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 150,
+    },
+
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+
     quantity: {
       type: Number,
       required: true,
       min: 1,
     },
 
-    price: {
+    unitPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    lineTotal: {
       type: Number,
       required: true,
       min: 0,
@@ -23,13 +42,34 @@ const invoiceItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const customerSnapshotSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
+    phone: { type: String, trim: true },
+    address: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
 const invoiceSchema = new mongoose.Schema(
   {
+    invoiceNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
       required: true,
       index: true,
+    },
+
+    customer: {
+      type: customerSnapshotSchema,
+      required: true,
     },
 
     items: {
@@ -41,10 +81,54 @@ const invoiceSchema = new mongoose.Schema(
       },
     },
 
+    currency: {
+      type: String,
+      required: true,
+      trim: true,
+      uppercase: true,
+      match: /^[A-Z]{3}$/,
+    },
+
+    issueDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+
+    taxRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+
+    subtotal: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    taxAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
     total: {
       type: Number,
       required: true,
       min: 0,
+    },
+
+    notes: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
     },
 
     status: {
@@ -64,6 +148,9 @@ const invoiceSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Invoice numbers are unique per user, not globally.
+invoiceSchema.index({ userId: 1, invoiceNumber: 1 }, { unique: true });
 
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 

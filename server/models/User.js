@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema(
       match: /^[A-Z]{3}$/,
       default: "USD",
     },
+        invoiceCounter: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,
