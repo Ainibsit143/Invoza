@@ -53,3 +53,8 @@ a {
     cursor: pointer;
   }
 }
+/* Printing / Save as PDF: A4 page with small margins */
+@page {
+  size: A4;
+  margin: 10mm;
+}

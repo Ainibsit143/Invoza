@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import RowActions from "../ui/RowActions";
 import StatusBadge from "./StatusBadge";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -40,9 +41,13 @@ function InvoiceTable({ invoices, busyId, onEdit, onDelete, onStatusChange }) {
               className={`rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:grid lg:items-center lg:gap-4 lg:rounded-none lg:border-0 lg:px-5 lg:py-4 lg:shadow-none ${COLUMNS}`}
             >
               <div>
-                <p className="text-sm font-semibold text-[#0B1730]">
+                <Link
+                to={`/invoices/${invoice._id}`}
+                className="inline-block text-sm font-semibold text-[#0B1730] hover:text-[#12B8A6] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#12B8A6]"
+                >
                   {invoice.invoiceNumber}
-                </p>
+                </Link>
+
                 <p className="mt-0.5 break-words text-sm text-slate-600">
                   {invoice.customer?.name}
                 </p>
@@ -60,6 +65,15 @@ function InvoiceTable({ invoices, busyId, onEdit, onDelete, onStatusChange }) {
               </p>
 
               <div className="-mb-1 -ml-3 mt-3 flex flex-wrap items-center gap-1 empty:hidden lg:m-0 lg:justify-end lg:empty:block">
+                
+                <Link
+                to={`/invoices/${invoice._id}`}
+                aria-label={`View ${invoice.invoiceNumber}`}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#0F766E] hover:bg-[#12B8A6]/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#12B8A6]"
+                >
+                    View
+                </Link>
+
                 {getNextStatuses(invoice).map((next) => (
                   <button
                     key={next}

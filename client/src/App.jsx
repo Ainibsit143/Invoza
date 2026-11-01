@@ -9,6 +9,7 @@ import Customers from "./pages/customers/Customers";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Invoices from "./pages/invoices/Invoices";
 import InvoiceEditor from "./pages/invoices/InvoiceEditor";
+import InvoiceView from "./pages/invoices/InvoiceView";
 import Products from "./pages/products/Products";
 import Settings from "./pages/settings/Settings";
 
@@ -30,6 +31,7 @@ function App() {
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/invoices/new" element={<InvoiceEditor key="new" />} />
               <Route path="/invoices/:id/edit" element={<InvoiceEditor key="edit" />} />
+              <Route path="/invoices/:id" element={<InvoiceView />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>

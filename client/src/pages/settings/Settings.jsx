@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import Button from "../../components/ui/Button";
+import BusinessProfile from "../../components/settings/BusinessProfile";
 import { useAuth } from "../../context/AuthContext";
 import { CURRENCIES } from "../../utils/currencies";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -105,6 +106,7 @@ function Settings() {
           </Button>
         </div>
       </form>
+            <BusinessProfile />
     </div>
   );
 }

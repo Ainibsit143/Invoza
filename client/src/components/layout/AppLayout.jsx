@@ -25,9 +25,9 @@ function AppLayout() {
   }, [menuOpen]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 print:bg-white">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:block lg:w-64">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:block lg:w-64 print:hidden">
         <Sidebar />
       </aside>
 
@@ -45,10 +45,10 @@ function AppLayout() {
         </div>
       )}
 
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 print:pl-0">
         <Topbar onMenuClick={() => setMenuOpen(true)} menuOpen={menuOpen} />
 
-        <main className="px-4 py-8 sm:px-8">
+        <main className="px-4 py-8 sm:px-8 print:p-0">
           <Outlet />
         </main>
       </div>

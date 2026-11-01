@@ -6,7 +6,7 @@ function Topbar({ onMenuClick, menuOpen }) {
   const initial = user?.name?.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-8 print:hidden">
       <button
         type="button"
         onClick={onMenuClick}
