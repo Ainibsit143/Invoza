@@ -2,7 +2,6 @@ import InvozaLogo from "../ui/InvozaLogo";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
-const DAY = 24 * 60 * 60 * 1000;
 
 const ITEM_COLUMNS = "grid-cols-[minmax(0,1fr)_4rem_7.5rem_7.5rem]";
 
@@ -28,9 +27,6 @@ function InvoiceDocument({ invoice }) {
 
   const money = (amount) => formatCurrency(amount, invoice.currency);
 
-  const termDays = Math.round(
-    (new Date(invoice.dueDate) - new Date(invoice.issueDate)) / DAY
-  );
 
   const fromLines = [
     business.address,
@@ -96,9 +92,9 @@ function InvoiceDocument({ invoice }) {
           </div>
 
           <dl className="space-y-2 rounded-lg bg-slate-100 p-4 text-sm">
-            <MetaRow label="Invoice Number">{invoice.invoiceNumber}</MetaRow>
-            <MetaRow label="Date">{formatDate(invoice.issueDate)}</MetaRow>
-            <MetaRow label="Due Date">{formatDate(invoice.dueDate)}</MetaRow>
+            <MetaRow label="Invoice Number:">{invoice.invoiceNumber}</MetaRow>
+            <MetaRow label="Date:">{formatDate(invoice.issueDate)}</MetaRow>
+            <MetaRow label="Due Date:">{formatDate(invoice.dueDate)}</MetaRow>
           </dl>
         </div>
 
@@ -182,62 +178,56 @@ function InvoiceDocument({ invoice }) {
           </p>
         </div>
 
-        {/* Terms, payment details, business details */}
-        <div className="mt-8 grid grid-cols-2 gap-6">
-          <div className="space-y-4">
-            {Number.isFinite(termDays) && termDays > 0 && (
-              <p className="text-sm font-semibold text-[#0B1730]">
-                Payment due within {termDays} {termDays === 1 ? "day" : "days"}
+                {/* Business details */}
+        {(business.name || fromLines.length > 0) && (
+          <div className="ml-auto mt-8 min-w-0 max-w-xs text-right">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+              From
+            </p>
+            {business.name && (
+              <p className="mt-2 break-words text-sm font-semibold text-[#0B1730]">
+                {business.name}
               </p>
             )}
-
-            {business.paymentDetails && (
-              <div className="rounded-lg bg-slate-100 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
-                  Payment details
-                </p>
-                <p className="mt-2 whitespace-pre-line break-words text-sm text-[#0B1730]">
-                  {business.paymentDetails}
-                </p>
-              </div>
-            )}
-
-            {invoice.notes && (
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
-                  Notes
-                </p>
-                <p className="mt-2 whitespace-pre-line break-words text-sm text-slate-700">
-                  {invoice.notes}
-                </p>
-              </div>
-            )}
+            {fromLines.map((line, index) => (
+              <p
+                key={index}
+                className="mt-0.5 whitespace-pre-line break-words text-sm text-slate-600"
+              >
+                {line}
+              </p>
+            ))}
           </div>
+        )}
 
-          {(business.name || fromLines.length > 0) && (
-            <div className="min-w-0 text-right">
+        {/* Terms, payment details and notes (pushed down, just above the footer) */}
+        <div className="mt-auto space-y-4 pt-8">
+
+          {business.paymentDetails && (
+            <div>
               <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
-                From
+                Payment details
               </p>
-              {business.name && (
-                <p className="mt-2 break-words text-sm font-semibold text-[#0B1730]">
-                  {business.name}
-                </p>
-              )}
-              {fromLines.map((line, index) => (
-                <p
-                  key={index}
-                  className="mt-0.5 whitespace-pre-line break-words text-sm text-slate-600"
-                >
-                  {line}
-                </p>
-              ))}
+              <p className="mt-2 whitespace-pre-line break-words text-sm text-[#0B1730]">
+                {business.paymentDetails}
+              </p>
+            </div>
+          )}
+
+          {invoice.notes && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
+                Notes
+              </p>
+              <p className="mt-2 whitespace-pre-line break-words text-sm text-slate-700">
+                {invoice.notes}
+              </p>
             </div>
           )}
         </div>
 
-                {/* Footer: Powered by Invoza (stays at the bottom of the page) */}
-        <div className="mt-auto pt-8">
+        {/* Footer: Powered by Invoza (stays at the bottom of the page) */}
+        <div className="pt-6">
           <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500">
             <span>Powered by</span>
             <InvozaLogo className="text-base" />
