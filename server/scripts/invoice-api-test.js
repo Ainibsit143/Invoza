@@ -176,7 +176,12 @@ const main = async () => {
     ["negative tax rate", { ...valid, taxRate: -5 }, 400],
     ["no items", { ...valid, items: [] }, 400],
     ["quantity 0", { ...valid, items: [{ productId: product._id, quantity: 0 }] }, 400],
-    ["decimal quantity", { ...valid, items: [{ productId: product._id, quantity: 1.5 }] }, 400],
+    ["quantity below 1", { ...valid, items: [{ productId: product._id, quantity: 0.5 }] }, 400],
+    ["quantity with 3 decimals", { ...valid, items: [{ productId: product._id, quantity: 1.555 }] }, 400],
+    ["quantity over 10000", { ...valid, items: [{ productId: product._id, quantity: 10001 }] }, 400],
+    ["quantity as text", { ...valid, items: [{ productId: product._id, quantity: "2" }] }, 400],
+    ["unit price over the limit", { ...valid, items: [{ productId: product._id, quantity: 1, unitPrice: 100000001 }] }, 400],
+    ["more than 50 items", { ...valid, items: Array.from({ length: 51 }, () => ({ productId: product._id, quantity: 1 })) }, 400],
     ["negative unit price", { ...valid, items: [{ productId: product._id, quantity: 1, unitPrice: -1 }] }, 400],
     ["object instead of customer id", { ...valid, customerId: { $gt: "" } }, 400],
     ["object instead of product id", { ...valid, items: [{ productId: { $gt: "" }, quantity: 1 }] }, 400],
@@ -189,6 +194,12 @@ const main = async () => {
     res = await call("POST", "/invoices", token, body);
     expectStatus(`${name} -> ${status}`, res, status);
   }
+
+  res = await call("POST", "/invoices", token, {
+    ...valid,
+    items: [{ productId: product._id, quantity: 1.5 }],
+  });
+  expectStatus("decimal quantity (1.5) -> 201", res, 201);
 
   res = await call("GET", "/invoices/not-an-id", token);
   expectStatus("malformed invoice id -> 400", res, 400);

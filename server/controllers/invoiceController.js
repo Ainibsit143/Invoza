@@ -16,7 +16,13 @@ const SUPPORTED_CURRENCIES = new Set(
   )
 );
 
-const MAX_ITEMS = 100;
+const MAX_ITEMS = 50;
+const MAX_QUANTITY = 10000;
+const MAX_UNIT_PRICE = 100000000;
+
+// True when a number has at most 2 decimal places (1, 1.5, 2.25)
+const hasMaxTwoDecimals = (value) =>
+  Math.abs(Math.round(value * 100) - value * 100) < 1e-6;
 
 // Must be a 24-char hex string (rejects objects like { $gt: "" })
 const isObjectIdString = (value) =>
@@ -68,17 +74,24 @@ const prepareInvoiceData = async (body, userId) => {
       return fail(400, "Each item needs a valid product");
     }
 
-    if (!Number.isInteger(item.quantity) || item.quantity < 1) {
-      return fail(400, "Quantity must be a whole number of at least 1");
+    if (
+        typeof item.quantity !== "number" ||
+        !Number.isFinite(item.quantity) || 
+        item.quantity < 1 ||
+        item.quantity > MAX_QUANTITY ||
+        !hasMaxTwoDecimals(item.quantity)
+    ) {
+      return fail(400, `Quantity must be between 1 and ${MAX_QUANTITY}, with up to 2 decimals`);
     }
 
     if (
       item.unitPrice !== undefined &&
       (typeof item.unitPrice !== "number" ||
         !Number.isFinite(item.unitPrice) ||
-        item.unitPrice < 0)
+        item.unitPrice < 0 ||
+        item.unitPrice > MAX_UNIT_PRICE )
     ) {
-      return fail(400, "Unit price must be a non-negative number");
+      return fail(400, `Unit price must be a number between 0 and ${MAX_UNIT_PRICE.toLocaleString("en-US")}`);
     }
   }
 

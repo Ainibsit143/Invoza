@@ -25,12 +25,14 @@ const invoiceItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+      max: 10000,
     },
 
     unitPrice: {
       type: Number,
       required: true,
       min: 0,
+      max: 100000000,
     },
 
     lineTotal: {
@@ -93,7 +95,7 @@ const invoiceSchema = new mongoose.Schema(
       type: [invoiceItemSchema],
       required: true,
       validate: {
-        validator: (items) => items.length > 0,
+        validator: (items) => items.length > 0 && items.length <=50,
         message: "Invoice must contain at least one item",
       },
     },
