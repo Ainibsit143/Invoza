@@ -10,6 +10,32 @@ import { calculateInvoiceTotals } from "../../utils/invoiceTotals";
 const COLUMNS =
   "grid grid-cols-2 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1.5fr)_auto]";
 
+// Same limits as the server
+const MAX_ITEMS = 50;
+const MAX_QUANTITY = 10000;
+const MAX_UNIT_PRICE = 100000000;
+
+const DECIMAL_2 = /^\d+(\.\d{1,2})?$/;
+
+function validateQuantity(value) {
+  const text = String(value).trim();
+
+  if (!DECIMAL_2.test(text)) return "Number with up to 2 decimals";
+  if (Number(text) < 1) return "Minimum quantity is 1";
+  if (Number(text) > MAX_QUANTITY) return "Maximum quantity is 10,000";
+
+  return true;
+}
+
+function validateUnitPrice(value) {
+  const text = String(value).trim();
+
+  if (!DECIMAL_2.test(text)) return "Up to 2 decimals, 0 or more";
+  if (Number(text) > MAX_UNIT_PRICE) return "Maximum price is 100,000,000";
+
+  return true;
+}
+
 function InvoiceItemsEditor({ products }) {
   const {
     control,
@@ -27,6 +53,8 @@ function InvoiceItemsEditor({ products }) {
   const currency = useWatch({ control, name: "currency" });
   const { lineTotals } = calculateInvoiceTotals(items, 0);
 
+  const itemLimitReached = fields.length >= MAX_ITEMS;
+
   return (
     <section aria-labelledby="items-heading">
       <div className="flex items-center justify-between gap-4">
@@ -38,6 +66,7 @@ function InvoiceItemsEditor({ products }) {
         </h2>
         <Button
           variant="secondary"
+          disabled={itemLimitReached}
           onClick={() =>
             append({ productId: "", quantity: "1", unitPrice: "" })
           }
@@ -45,6 +74,12 @@ function InvoiceItemsEditor({ products }) {
           Add item
         </Button>
       </div>
+
+      {itemLimitReached && (
+        <p className="mt-3 text-sm text-slate-600">
+          An invoice can have up to {MAX_ITEMS} items.
+        </p>
+      )}
 
       {products.length === 0 && (
         <p className="mt-3 text-sm text-slate-600">
@@ -103,17 +138,15 @@ function InvoiceItemsEditor({ products }) {
                 label="Quantity"
                 name={`items.${index}.quantity`}
                 type="number"
-                inputMode="numeric"
-                step="1"
+                inputMode="decimal"
+                step="0.01"
                 min="1"
+                max={MAX_QUANTITY}
                 autoComplete="off"
                 error={fieldErrors?.quantity?.message}
                 register={register(`items.${index}.quantity`, {
                   required: "Quantity is required",
-                  validate: (value) =>
-                    (/^\d+$/.test(String(value).trim()) &&
-                      Number(value) >= 1) ||
-                    "Whole number, 1 or more",
+                  validate: validateQuantity,
                 })}
               />
 
@@ -124,14 +157,13 @@ function InvoiceItemsEditor({ products }) {
                 inputMode="decimal"
                 step="0.01"
                 min="0"
+                max={MAX_UNIT_PRICE}
                 autoComplete="off"
                 placeholder="0.00"
                 error={fieldErrors?.unitPrice?.message}
                 register={register(`items.${index}.unitPrice`, {
                   required: "Price is required",
-                  validate: (value) =>
-                    /^\d+(\.\d{1,2})?$/.test(String(value).trim()) ||
-                    "Up to 2 decimals, 0 or more",
+                  validate: validateUnitPrice,
                 })}
               />
 
