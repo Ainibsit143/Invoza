@@ -48,3 +48,10 @@ export function calculateInvoiceStats(invoices, currency, today = getToday()) {
 
   return stats;
 }
+
+// True when an invoice is sent (unpaid) and its due date has passed
+export function isInvoiceOverdue(invoice, today = getToday()) {
+  if (invoice.status !== "sent") return false;
+
+  return String(invoice.dueDate).slice(0, 10) < today;
+}

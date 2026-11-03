@@ -7,6 +7,7 @@ import StatusBadge from "../../components/invoices/StatusBadge";
 import Button from "../../components/ui/Button";
 import { invoiceService } from "../../services/invoices";
 import { isEditable } from "../../utils/invoiceStatus";
+import { isInvoiceOverdue } from "../../utils/invoiceStats";
 
 function InvoiceView() {
   const { id } = useParams();
@@ -68,7 +69,7 @@ function InvoiceView() {
           >
             &larr; Back to invoices
           </Link>
-          {invoice && <StatusBadge status={invoice.status} />}
+          {invoice && <StatusBadge status={invoice.status} overdue={isInvoiceOverdue(invoice)}/>}
         </div>
 
         {invoice && (

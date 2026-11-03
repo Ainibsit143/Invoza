@@ -3,6 +3,7 @@ import RowActions from "../ui/RowActions";
 import StatusBadge from "./StatusBadge";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
+import { isInvoiceOverdue } from "../../utils/invoiceStats";
 import {
   STATUS_ACTION_LABELS,
   STATUS_TRANSITIONS,
@@ -57,7 +58,8 @@ function InvoiceTable({ invoices, busyId, onEdit, onDelete, onStatusChange }) {
               </div>
 
               <div className="mt-3 lg:mt-0">
-                <StatusBadge status={invoice.status} />
+                <StatusBadge status={invoice.status}
+                overdue={isInvoiceOverdue(invoice)} />
               </div>
 
               <p className="mt-2 text-sm font-semibold text-[#0B1730] lg:mt-0 lg:text-right">

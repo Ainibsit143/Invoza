@@ -10,6 +10,7 @@ import { formatDate } from "../../utils/formatDate";
 import {
   calculateInvoiceStats,
   getInvoiceCurrencies,
+  isInvoiceOverdue,
 } from "../../utils/invoiceStats";
 
 function StatCard({ label, value, hint, tone = "text-[#0B1730]" }) {
@@ -233,7 +234,10 @@ function Dashboard() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <StatusBadge status={invoice.status} />
+                  <StatusBadge
+                    status={invoice.status}
+                    overdue={isInvoiceOverdue(invoice)}
+                     />
                   <span className="text-sm font-semibold text-[#0B1730]">
                     {formatCurrency(invoice.total, invoice.currency)}
                   </span>
